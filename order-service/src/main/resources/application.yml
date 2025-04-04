@@ -1,0 +1,86 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: order-service
+  
+  # Nacos配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ticketing_order?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: root
+
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        min-idle: 0
+        max-idle: 8
+
+  # 缓存配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      cache-null-values: true
+      use-key-prefix: true
+      key-prefix: "order:"
+
+  # RocketMQ配置
+  rocketmq:
+    name-server: localhost:9876
+    producer:
+      group: order-producer-group
+      send-message-timeout: 3000
+      retry-times-when-send-failed: 2
+
+# Seata配置
+seata:
+  tx-service-group: order-service-group
+  service:
+    vgroup-mapping:
+      order-service-group: default
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+      namespace: public
+      group: SEATA_GROUP
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ticketing.common.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 订单配置
+order:
+  # 订单超时时间（分钟）
+  timeout: 15
+  # 支付超时时间（分钟）
+  pay-timeout: 30
+  # 订单号前缀
+  number-prefix: "T"
+  # 每个用户每场次最大订单数
+  max-orders-per-user-event: 5 

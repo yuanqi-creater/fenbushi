@@ -1,0 +1,95 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: inventory-service
+  
+  # Nacos配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  
+  # ShardingJDBC配置
+  shardingsphere:
+    datasource:
+      names: ds0,ds1,ds2,ds3,ds4,ds5,ds6,ds7,ds8,ds9,ds10,ds11,ds12,ds13,ds14,ds15
+      # 配置第1个数据源
+      ds0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://localhost:3306/ticketing_0?useUnicode=true&characterEncoding=utf-8&useSSL=false
+        username: root
+        password: root
+      # 配置第2-16个数据源（省略，实际使用时需要配置）
+    
+    rules:
+      sharding:
+        tables:
+          t_inventory:
+            actual-data-nodes: ds${0..15}.t_inventory_${0..19}
+            database-strategy:
+              standard:
+                sharding-column: event_id
+                sharding-algorithm-name: database-inline
+            table-strategy:
+              standard:
+                sharding-column: sharding_id
+                sharding-algorithm-name: table-inline
+        sharding-algorithms:
+          database-inline:
+            type: INLINE
+            props:
+              algorithm-expression: ds${event_id % 16}
+          table-inline:
+            type: INLINE
+            props:
+              algorithm-expression: t_inventory_${sharding_id}
+    props:
+      sql-show: true
+
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+
+  # RocketMQ配置
+  rocketmq:
+    name-server: localhost:9876
+    producer:
+      group: inventory-producer-group
+
+# Seata配置
+seata:
+  tx-service-group: inventory-service-group
+  service:
+    vgroup-mapping:
+      inventory-service-group: default
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+      namespace: public
+      group: SEATA_GROUP
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ticketing.common.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0 

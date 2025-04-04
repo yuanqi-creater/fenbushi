@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ticketing.inventory.mapper.InventoryMapper">
+
+    <!-- 更新库存 -->
+    <update id="updateStock">
+        UPDATE t_inventory
+        SET available_stock = #{inventory.availableStock},
+            locked_stock = #{inventory.lockedStock},
+            sold_stock = #{inventory.soldStock},
+            version = version + 1,
+            update_time = NOW()
+        WHERE id = #{inventory.id}
+        AND version = #{inventory.version}
+    </update>
+
+    <!-- 查询指定场次和票种的所有分片库存 -->
+    <select id="selectByEventAndTicketType" resultType="com.ticketing.common.entity.Inventory">
+        SELECT *
+        FROM t_inventory
+        WHERE event_id = #{eventId}
+        AND ticket_type_id = #{ticketTypeId}
+    </select>
+
+    <!-- 查询指定分片的库存 -->
+    <select id="selectBySharding" resultType="com.ticketing.common.entity.Inventory">
+        SELECT *
+        FROM t_inventory
+        WHERE event_id = #{eventId}
+        AND ticket_type_id = #{ticketTypeId}
+        AND sharding_id = #{shardingId}
+        LIMIT 1
+    </select>
+</mapper> 
