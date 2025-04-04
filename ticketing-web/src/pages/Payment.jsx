@@ -19,7 +19,7 @@ import {
   LoadingOutlined,
   QrcodeOutlined
 } from '@ant-design/icons';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const { Step } = Steps;
 
@@ -175,7 +175,7 @@ const Payment = () => {
           <div style={{ textAlign: 'center' }}>
             <h3>请使用{paymentMethod === 'alipay' ? '支付宝' : '微信'}扫码支付</h3>
             <div style={{ marginTop: 24, marginBottom: 24 }}>
-              <QRCode value={qrCode} size={200} />
+              <QRCodeCanvas value={qrCode} size={200} />
             </div>
             <Statistic
               title="支付倒计时"

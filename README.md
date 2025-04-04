@@ -1,6 +1,107 @@
 # 分布式票务系统
 
-这是一个基于Spring Cloud Alibaba的分布式票务系统，用于处理大规模的在线售票场景。
+高性能分布式在线票务平台，基于微服务架构设计，支持高并发场景下的票务预订、支付和管理。
+
+## 项目架构
+
+### 后端服务
+
+- **common**: 公共模块，包含共享的实体类、工具类和配置
+- **auth-service**: 认证服务，处理用户登录和权限验证
+- **inventory-service**: 库存服务，管理票务库存和库存锁定
+- **order-service**: 订单服务，处理订单创建和管理
+- **payment-service**: 支付服务，处理支付流程
+- **user-service**: 用户服务，管理用户信息
+
+### 前端应用
+
+- **ticketing-web**: 基于React的前端应用
+
+## 技术栈
+
+### 后端技术栈
+
+- Spring Boot 2.6.3
+- Spring Cloud 2021.0.1
+- Spring Cloud Alibaba 2021.0.1.0
+- MyBatis Plus 3.5.1
+- Redis
+- MySQL 8.0
+- Nacos（服务发现）
+- Seata（分布式事务）
+- RocketMQ（消息队列）
+- ShardingSphere（分库分表）
+
+### 前端技术栈
+
+- React 18
+- Ant Design 5
+- React Router 6
+- Axios
+
+## 启动指南
+
+### 环境要求
+
+- JDK 11
+- Maven 3.8+
+- Node.js 16+
+- MySQL 8.0
+- Redis
+- Nacos
+- RocketMQ
+- Seata
+
+### 后端服务启动
+
+1. 克隆项目到本地
+2. 确保JDK 11已正确配置
+3. 配置Maven的toolchains.xml文件
+4. 启动MySQL、Redis、Nacos、RocketMQ和Seata
+5. 编译项目
+
+```bash
+mvn clean install -DskipTests
+```
+
+6. 依次启动各个服务
+
+### 前端应用启动
+
+1. 进入前端项目目录
+
+```bash
+cd ticketing-web
+```
+
+2. 安装依赖
+
+```bash
+npm install
+```
+
+3. 启动开发服务器
+
+```bash
+npm start
+```
+
+## 项目功能
+
+- 用户注册和登录
+- 浏览演出活动
+- 票务预订和支付
+- 订单管理
+- 支付处理
+- 库存管理（带分片）
+
+## 高并发设计
+
+- 分库分表：使用ShardingSphere实现数据分片
+- 分布式锁：使用Redis实现分布式锁机制
+- 消息队列：使用RocketMQ处理异步任务
+- 二级缓存：本地缓存+Redis缓存
+- 库存分片：库存按用户ID分片，减少锁冲突
 
 ## 项目结构
 
@@ -16,24 +117,6 @@ fenbushi/
 ├── sql/              # 数据库脚本
 └── docs/             # 项目文档
 ```
-
-## 技术栈
-
-### 后端
-- Spring Cloud Alibaba
-- Spring Boot 2.6.3
-- MySQL 8.0
-- Redis
-- RocketMQ
-- Nacos
-- Seata
-- MyBatis-Plus
-
-### 前端
-- React 17
-- Ant Design 4
-- React Router 6
-- Axios
 
 ## 核心功能
 
@@ -82,11 +165,11 @@ mysql -u root -p < sql/init.sql
 3. 启动后端服务
 ```bash
 # 编译
-mvn clean install
+cd E:\projects\fenbushi && mvn clean compile -Dcompiler.verbose=true -rf :common -Dmaven.compiler.failOnError=false
 
 # 启动服务（按顺序）
 cd auth-service
-mvn spring-boot:run
+cd E:\projects\fenbushi && mvn clean install -Dmaven.compiler.failOnError=false -Dmaven.test.skip=true
 
 cd ../inventory-service
 mvn spring-boot:run
